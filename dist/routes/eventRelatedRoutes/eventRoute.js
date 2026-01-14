@@ -1,0 +1,12 @@
+import express from 'express';
+import { getAllEventsCtrl, getOneEventCtrl } from '../../controllers/eventCtrl.js';
+import { validateParams, validateQuery } from '../../middleware/validationMiddleware.js';
+import { CancelBookingSchema, CreateBookingSchemaQuery, eventFiltersSchema, IdSchema } from '../../config/schemas/schemas.js';
+import { cancelBookingCtrl, createBookingCtrl } from '../../controllers/bookingCtrl.js';
+import { authenticateUser } from '../../middleware/authMiddleware.js';
+const router = express.Router();
+router.get('/', validateQuery(eventFiltersSchema), getAllEventsCtrl);
+router.get('/:id', validateParams(IdSchema), getOneEventCtrl);
+router.post('/book/:userId/:eventId/:quantity', authenticateUser, validateParams(CreateBookingSchemaQuery), createBookingCtrl);
+router.delete('/cancelBooking/:bookingId/:userId', authenticateUser, validateParams(CancelBookingSchema), cancelBookingCtrl);
+export default router;

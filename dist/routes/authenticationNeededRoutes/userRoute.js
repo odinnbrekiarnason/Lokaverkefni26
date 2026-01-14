@@ -1,0 +1,10 @@
+import express from 'express';
+import { editUserCtrl, deleteUserCtrl, getMyBookingsCtrl } from '../../controllers/UserCtrl.js';
+import { validateBody, validateParams } from '../../middleware/validationMiddleware.js';
+import { DeleteUserSchemaBody, editUserSchema, IdSchema } from '../../config/schemas/schemas.js';
+import { authenticateUser } from '../../middleware/authMiddleware.js';
+const router = express.Router();
+router.put('/:id', authenticateUser, validateParams(IdSchema), validateBody(editUserSchema), editUserCtrl);
+router.delete('/:id', authenticateUser, validateParams(IdSchema), validateBody(DeleteUserSchemaBody), deleteUserCtrl);
+router.get('/bookings/:id', authenticateUser, validateParams(IdSchema), getMyBookingsCtrl);
+export default router;
