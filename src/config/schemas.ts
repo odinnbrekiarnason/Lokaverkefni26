@@ -18,39 +18,77 @@ export const PaymentSchemaBody = z.object({
 
 export type paymentTypeBody = z.infer<typeof PaymentSchemaBody>;
 //==========================================================================================================================================
-export const CreateUserSchema = 
+export const CreateUserSchema = z.preprocess(
+  (input: any) => {
+    if (typeof input !== 'object' || input === null) return input;
+    return {
+      user_name: input.user_name ?? input.user ?? input.name,
+      email: input.email,
+      password_hash: input.password_hash ?? input.password ?? input.pw,
+      userRole: input.userRole,
+      wallet: input.wallet
+    };
+  },
   z.object({
     user_name: z.string().min(3, 'Username must be at least 3 characters').max(30, 'Username too long'),
     email: z.email('Invalid email address').toLowerCase(),
     password_hash: z.string().min(8, 'Password must be at least 8 characters'),
     userRole: UserRoleSchema.default('User'),
     wallet: z.int('Wallet has to be a number').min(0, 'Wallet cannot be set to 0').positive('Wallet cannot be negative').optional().default(10000)
-  });
+  })
+);
 
 export type CreateUserType = z.infer<typeof CreateUserSchema>;
 //==========================================================================================================================================
-export const DeleteUserSchemaBody = 
-z.object({
-  email: z.email('Invalid email'),
-  password_hash: z.string().min(1, 'Password is required for deletion'),
-});
+export const DeleteUserSchemaBody = z.preprocess(
+  (input: any) => {
+    if (typeof input !== 'object' || input === null) return input;
+    return {
+      email: input.email,
+      password_hash: input.password_hash ?? input.password ?? input.pw
+    };
+  },
+  z.object({
+    email: z.email('Invalid email'),
+    password_hash: z.string().min(1, 'Password is required for deletion'),
+  })
+);
 
 export type deleteUserTypeBody = z.infer<typeof DeleteUserSchemaBody>;
 //==========================================================================================================================================
-export const LoginSchema = 
-z.object({
-  email: z.email('Invalid email').nonoptional('Email required'),
-  password_hash: z.string('Password has to be a string').min(8, 'Password must be at least 8 characters').nonoptional('Password required'),
-});
+export const LoginSchema = z.preprocess(
+  (input: any) => {
+    if (typeof input !== 'object' || input === null) return input;
+    return {
+      email: input.email,
+      password_hash: input.password_hash ?? input.password ?? input.pw
+    };
+  },
+  z.object({
+    email: z.email('Invalid email').nonoptional('Email required'),
+    password_hash: z.string('Password has to be a string').min(8, 'Password must be at least 8 characters').nonoptional('Password required'),
+  })
+);
 
 export type LoginType = z.infer<typeof LoginSchema>;
 //==========================================================================================================================================
-export const editUserSchema = 
-z.object({
-  user_name: z.string().max(30, 'Username too long').min(3, 'Username must be atleast 3 characters').optional(),
-  email: z.email('Invalid email address').toLowerCase().optional(),
-  password_hash: z.string().min(8, 'Passsword must be atelast 8 characters').optional()
-});
+export const editUserSchema = z.preprocess(
+  (input: any) => {
+    if (typeof input !== 'object' || input === null) return input;
+    const result: any = {};
+    const userName = input.user_name ?? input.user ?? input.name;
+    if (userName !== undefined) result.user_name = userName;
+    if (input.email !== undefined) result.email = input.email;
+    const passwordHash = input.password_hash ?? input.password ?? input.pw;
+    if (passwordHash !== undefined) result.password_hash = passwordHash;
+    return result;
+  },
+  z.object({
+    user_name: z.string().max(30, 'Username too long').min(3, 'Username must be atleast 3 characters').optional(),
+    email: z.email('Invalid email address').toLowerCase().optional(),
+    password_hash: z.string().min(8, 'Passsword must be atelast 8 characters').optional()
+  })
+);
 
 export type EditUserType = z.infer<typeof editUserSchema>;
 //==========================================================================================================================================
