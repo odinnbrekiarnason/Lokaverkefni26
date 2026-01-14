@@ -198,8 +198,8 @@ describe('Events - UC1 & UC2: View events and event details', () => {
       mockedGetEventById.mockResolvedValue(null);
 
       const res = await request(app).get('/api/events/999');
-      expect(res.status).toBe(200);
-      expect(res.body.event).toBeNull();
+      expect(res.status).toBe(404);
+      expect(res.body.event).toBeUndefined();
     });
 
     it('should reject invalid event ID parameter', async () => {

@@ -14,9 +14,6 @@ export const getAllEventsCtrl = async (req: Request, res: Response, next: NextFu
     }
 
     const result = await getAllEvents(filters);
-    if(!result) {
-      return res.status(400).json({error: 'Filter input incorrect'});
-    }
     
     return res.status(200).json({events: result});
   } catch(e) {
@@ -28,11 +25,11 @@ export const getOneEventCtrl = async(req: Request, res: Response, next: NextFunc
   try{
     const {id}: IdParam = req.paramsParsed;
 
-    if(!id) {
-      return res.status(404).json({error: 'No event found on this ID'});
-    }
-
     const result = await getEventById(id);
+
+    if(result?.id === undefined) {
+      return res.status(404).json({error: 'No event found on Id'});
+    }
     return res.status(200).json({event: result});
   } catch(e) {
     next(e)

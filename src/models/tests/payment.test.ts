@@ -3,13 +3,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('../../services/getters/userGetters', async() => ({
   getUserById: vi.fn(),
   getMyEvents: vi.fn(),
+  addFunds: vi.fn(),
 }));
 
 import request from 'supertest';
 import app from '../../app';
-import { getMyEvents, getUserById } from '../../services/getters/userGetters';
+import { getUserById, addFunds } from '../../services/getters/userGetters';
 import jwt from 'jsonwebtoken';
 
+const mockedAddFunds = vi.mocked(addFunds);
 const mockedGetUserById = vi.mocked(getUserById);
 
 const createToken = (userId: number, role: 'User' | 'Admin' = 'User') => {
@@ -39,7 +41,13 @@ describe('Payment - Add funds to wallet', () => {
         updatedAt: new Date(),
       };
 
+      const mockFunds = {
+        user_name: 'Alice',
+        wallet: 15000
+      }
+
       mockedGetUserById.mockResolvedValue(mockUser);
+      mockedAddFunds.mockResolvedValue(mockFunds);
 
       const res = await request(app)
         .put('/api/me/payme')
@@ -63,6 +71,12 @@ describe('Payment - Add funds to wallet', () => {
         updatedAt: new Date(),
       };
 
+       const mockFunds = {
+        user_name: 'Alice',
+        wallet: 15000
+      }
+
+      mockedAddFunds.mockResolvedValue(mockFunds);
       mockedGetUserById.mockResolvedValue(mockUser);
 
       const res = await request(app)

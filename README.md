@@ -397,4 +397,3 @@ Notaðu setup og teardown til að stjórna ástandi gagnagrunnsprófa.
 - Skrifaðu prófanir á meðan þú þróar, ekki eftir á
 
 Gangi þér vel! 🎫
-"# Lokaverkefni26" 

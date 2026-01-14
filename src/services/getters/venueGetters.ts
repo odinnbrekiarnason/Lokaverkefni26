@@ -2,8 +2,8 @@ import db from "../../config/db.js";
 import { Venue } from "../../config/typesAndInterfaces.js";
 import { getEventById } from "./eventGetters.js";
 
-export const getAllVenues = async(): Promise<Venue> => {
-  return await db.one('select * from venues');
+export const getAllVenues = async(): Promise<Venue[]> => {
+  return await db.many<Venue>('select * from venues');
 }
 //===============================================================================================
 export const getVenueById = async(id: number): Promise<Venue | null> => {

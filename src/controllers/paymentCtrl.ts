@@ -1,13 +1,7 @@
 import {NextFunction, Request, Response} from 'express'
-import db from '../config/db.js'
-import { User } from '../config/typesAndInterfaces.js';
-import { getUserById } from '../services/getters/userGetters.js';
+import { addFunds, getUserById } from '../services/getters/userGetters.js';
 
-export const addFunds = async(amount: number, userId: number): Promise<Partial<User>> => {
-  return await db.one<Partial<User>>('update users set wallet = wallet + $1 where id = $2 returning user_name, wallet', [amount, userId]);
-}
-
-export const addFundCtrl = async(req: Request, res: Response, next: NextFunction) => {
+export const addFundsCtrl = async(req: Request, res: Response, next: NextFunction) => {
   try{
     const userId = req.user?.id;
     if(!userId) {
@@ -26,11 +20,14 @@ export const addFundCtrl = async(req: Request, res: Response, next: NextFunction
     }
 
     const result = await addFunds(amountNumber, userId);
-    console.log(result);
+    const uN = result.user_name;
+    const wallet = result.wallet;
+
     return res.status(200).json({
       success: true, 
       message: 'Funds have been added to you account!',
-      result: result
+      user_name: uN,
+      wallet: wallet
     });
   } catch(e) {
     next(e);

@@ -39,7 +39,7 @@ export const createBookingCtrl = async (req: Request, res: Response, next: NextF
       });
     };
 
-    const result = await createBooking(event_id, ticket!.id, quantity);
+    const result = await createBooking(userId, event_id, ticket!.id, quantity);
     return res.status(200).json({success: true, result: result});
   } catch (e) {
     next(e)

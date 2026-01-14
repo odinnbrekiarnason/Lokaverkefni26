@@ -1,7 +1,80 @@
 -- ===============================================================================================
 -- SEED DATA FOR EVENT TICKETING SYSTEM
 -- ===============================================================================================
+--Fresh setup 
+DROP TABLE IF EXISTS bookings CASCADE;
+DROP TABLE IF EXISTS tickets CASCADE;
+DROP TABLE IF EXISTS events CASCADE;
+DROP TABLE IF EXISTS categories CASCADE;
+DROP TABLE IF EXISTS venues CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
 
+-- ===============================================================================================
+-- USERS TABLE
+-- ===============================================================================================
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  user_name VARCHAR(30) NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  user_role VARCHAR(20) NOT NULL DEFAULT 'User' CHECK (user_role IN ('Admin', 'User', 'Guest')),
+  wallet INT NOT NULL DEFAULT 10000,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+-- ===============================================================================================
+-- CATEGORIES TABLE
+-- ===============================================================================================
+CREATE TABLE IF NOT EXISTS categories (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+);
+
+-- ===============================================================================================
+-- VENUES TABLE
+-- ===============================================================================================
+CREATE TABLE IF NOT EXISTS venues (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL UNIQUE,
+  city VARCHAR(100) NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  capacity INT NOT NULL CHECK (capacity > 0),
+);
+
+-- ===============================================================================================
+-- EVENTS TABLE
+-- ===============================================================================================
+CREATE TABLE IF NOT EXISTS events (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  date TIMESTAMP WITH TIME ZONE NOT NULL,
+  description TEXT,
+  venue_id INT NOT NULL REFERENCES venues(id) ON DELETE CASCADE,
+  category_id INT NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+);
+
+-- ===============================================================================================
+-- TICKETS TABLE
+-- ===============================================================================================
+CREATE TABLE IF NOT EXISTS tickets (
+  id SERIAL PRIMARY KEY,
+  event_id INT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  price INT NOT NULL CHECK (price >= 0),
+  quantity_available INT NOT NULL CHECK (quantity_available >= 0),
+);
+
+-- ===============================================================================================
+-- BOOKINGS TABLE
+-- ===============================================================================================
+CREATE TABLE IF NOT EXISTS bookings (
+  id SERIAL PRIMARY KEY,
+  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  event_id INT NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+  ticket_id INT NOT NULL REFERENCES tickets(id) ON DELETE CASCADE,
+  quantity INT NOT NULL CHECK (quantity > 0),
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
 -- ===============================================================================================
 -- INSERT CATEGORIES
 -- ===============================================================================================
@@ -12,7 +85,6 @@ INSERT INTO categories (category_name) VALUES
   ('Theater'),
   ('Conference'),
   ('Festival')
-
 
 -- ===============================================================================================
 -- INSERT VENUES
@@ -75,12 +147,4 @@ INSERT INTO bookings (user_id, event_id, ticket_id, quantity) VALUES
   (5, 2, 3, 2)       -- comedy_fan books 2 tickets for Comedy Night
 ON CONFLICT DO NOTHING;
 
--- ===============================================================================================
--- VERIFICATION QUERIES (Run these to verify data insertion)
--- ===============================================================================================
--- SELECT COUNT(*) as total_categories FROM categories;
--- SELECT COUNT(*) as total_venues FROM venues;
--- SELECT COUNT(*) as total_users FROM users;
--- SELECT COUNT(*) as total_events FROM events;
--- SELECT COUNT(*) as total_tickets FROM tickets;
--- SELECT COUNT(*) as total_bookings FROM bookings;
+

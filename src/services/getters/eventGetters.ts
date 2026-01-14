@@ -47,7 +47,10 @@ export const getAllEvents = async(filters?: EventFilters) => {
   const order = filters.order === 'desc' ? 'desc' : 'asc';
 
   const whereSql = query.length ? 'and ' + query.join(' and ') : '';
-  let sql = `select e.*, v.address as venue_address, v.city as venue_city from events e join venues v on e.venue_id = v.id where e.date >= now() ${whereSql} order by e.${sort} ${order}`;
+  let sql = `select e.*, v.address as venue_address, v.city as venue_city
+  from events e 
+  join venues v on e.venue_id = v.id 
+  where e.date >= now() ${whereSql} order by e.${sort} ${order}`;
 
   if (filters.page && filters.limit) {
     const pagination = (filters.page - 1) * filters.limit;
@@ -61,6 +64,10 @@ export const getAllEvents = async(filters?: EventFilters) => {
 //===============================================================================================
 export const getEventById = async(eventId: number): Promise<Event | null> => {
   return await db.oneOrNone('select * from events where id = $1', [eventId]);
+}
+//===============================================================================================
+export const getEventInfoById = async(eventId: number) => {
+  return await db.oneOrNone(`select e.*, v.address as venue_address, v.city as venueÖ_city, t.price, t.quantity_available`)
 }
 //===============================================================================================
 export const getEventsByVenueId = async(venueId: number): Promise<Event[] | null> => {

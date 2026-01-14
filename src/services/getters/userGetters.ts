@@ -32,8 +32,14 @@ export const getMyEvents = async(user_id: number): Promise<any | null> => {
       join events e on b.event_id = e.id
       join venues v on e.venue_id = v.id
       join categories c on e.category_id = c.id 
+      where u.id = $1
       group by date, address, city, event_name, ticket_count, category, booking_id
       order by date desc
-    where id = $1
     `, [user_id]);
+}
+
+//===============================================================================================
+
+export const addFunds = async(amount: number, userId: number): Promise<Partial<User>> => {
+  return await db.one<Partial<User>>('update users set wallet = wallet + $1 where id = $2 returning user_name, wallet', [amount, userId]);
 }
